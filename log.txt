@@ -1,0 +1,76 @@
+## [2026-10-24T19:27:12Z] SESSION START
+
+tool=Claude Code
+model=claude-sonnet-5-5
+Repo Root: /Users/shankar/hackerrank/hackerrank-orchestrate-october26
+Branch: main
+Worktree: main
+Parent Agent: none
+Language: py
+Time Remaining: not configured
+
+## [2026-10-24T19:27:56Z] Read plan docs, log session start, build scorer first
+
+User Prompt (verbatim, secrets redacted):
+Read AGENTS.md and docs/plan/ fully. Log SESSION START with real tool= and model= values. Then build the scorer first: compare an output.csv against dataset/sample_output.csv and report status accuracy, step-level precision and recall, and sequence match. Don't write any solver code yet. Show me the scorer's output when it runs.
+
+Agent Response Summary:
+Read AGENTS.md and docs/plan (already loaded via CLAUDE.md), appended SESSION START, and wrote code/scorer.py (status accuracy + confusion, step-level P/R/F1, field-level accuracy, exact and LCS sequence match, --self-test). Verified: gold vs gold scores 1.0 everywhere, blank template scores 0, a deterministic degraded copy scores in between. No solver code written; no output.csv exists yet.
+
+Actions:
+* appended SESSION START to log.txt
+* created code/scorer.py
+* ran: python3 -I code/scorer.py --self-test, --pred dataset/sample_output.csv, --pred dataset/output.csv
+* created HANDOFF.md
+
+Context:
+tool=Claude Code
+model=claude-sonnet-5-5
+branch=main
+repo_root=/Users/shankar/hackerrank/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none
+
+## [2026-10-24T19:34:24Z] Evidence normalizer + observation store + coverage report
+
+User Prompt (verbatim, secrets redacted):
+Build the evidence normalizer and observation store per docs/plan/03_ARCHITECTURE.md. Start with the three biggest families: JSON bundles, key=value logs, and SQL snapshots including replica tables. Every observation needs file_id, captured_at, system_id, resource_id, category, state and subject key. Then write a coverage report listing all 94 evidence files. Each file should show how many observations it produced, or an explicit reason it was skipped, such as "PNG, needs vision". Don't hardcode any case, user or resource ids. Show me the coverage report and the per-family counts.
+
+Agent Response Summary:
+Inspected all JSON/log/SQL shapes first, then wrote code/logparse.py (6 log dialects, all 1,577 lines parse), code/observations.py (Observation + Store), code/normalizer.py (JSON, logs with trace_id join, SQLite incl. replica tables, handover txt) and code/coverage.py. 2,892 observations from 79 of 94 files; 15 skipped with reasons (11 PNG needs vision, 4 PDF not built); 1 empty SQL snapshot reported as valid. tests/test_normalizer.py checks every file reported once and no hardcoded ids. No state-at-audit logic or solver yet.
+
+Actions:
+* created code/logparse.py, code/observations.py, code/normalizer.py, code/coverage.py, tests/test_normalizer.py
+* generated code/evaluation/coverage_report.md
+* ran: python3 -I tests/test_normalizer.py; python3 -I code/coverage.py
+* updated HANDOFF.md
+
+Context:
+tool=Claude Code
+model=claude-sonnet-5-5
+branch=main
+repo_root=/Users/shankar/hackerrank/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none
+
+## [2026-10-24T19:37:47Z] Validate store vs samples (eval-only), investigate anomalies
+
+User Prompt (verbatim, secrets redacted):
+Before building the identity graph, validate the observation store against the samples. (1) For each of the 32 sample cases, take every non-account resource_id in sample_output.csv and check it exists in the store with the category and state its step implies. Use gold only inside this evaluation script, never in the solver path. Report per-category recall and list every missing or mismatched resource with its file. (2) Investigate the two rows whose observed_at is later than their file's captured_at, and tell me what they are. (3) Model empty collections as coverage records: file, store or collection, captured_at, row_count 0. (4) Prove or disprove that the ignored log events (cache misses, deletion-marker checks) never change a sample answer. (5) Add the pdftotext parser for the 4 PDFs. Show me the recall table and the mismatch list before changing anything.
+
+Agent Response Summary:
+Wrote code/evaluation/store_vs_samples.py (gold used only there). Result: 79 non-account sample resources, 75 in store, 69 match implied state at audit_at. 10 mismatches: 7 security audit ids (5 only in post-audit files, 2 in no file), case_07 support_001 (PDF not parsed), case_10 support_002 (wrong inferred state), case_12 analytics_9914 (store says MARKETING_PROFILE, eval filter excluded it). The 2 late rows are post-audit recreation rows inside files exported before them (cases 135, 383). deletion_marker_check disproved as ignorable; cache_lookup proven harmless. Held items 3 and 5 and all store changes per user instruction.
+
+Actions:
+* created code/evaluation/store_vs_samples.py
+* ran: python3 -I code/evaluation/store_vs_samples.py; inspected two ledgers, support_replica.log, system_activity
+* no change to normalizer/store
+
+Context:
+tool=Claude Code
+model=claude-sonnet-5-5
+branch=main
+repo_root=/Users/shankar/hackerrank/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none
+

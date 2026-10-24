@@ -1,0 +1,21 @@
+# Data facts and traps (verified by arena round 1; scripts were in a scratchpad, re-verify cheaply)
+
+## Dataset
+518 requests (deletion_requests.csv), 32 samples, user_identities.csv (850), user_audit_log.csv (306), system_activity.csv (4011), deletion_rules.csv (15), evidence_files.csv -> 94 files: 28 json, 26 log, 24 sql, 11 png, 4 pdf, 1 txt.
+email_hash = sha256(lower(email)) verified 850/850. Stored identities lowercase; 20 request emails are mixed case. No email shared across users. 418 request emails current, 100 historical-only (resolve via audit log).
+Every evidence format encodes (system, resource_id, category, state, subject key, time). Normalize all into ONE observation store. Handover line example: `2026-10-01T12:00:00Z | search_service | search_052 | SEARCH_INDEX_ENTRY | FOUND | novak.tomasz@icloud.com`.
+518 cases = ~50 batches of ~10 sharing an audit_at + 22 one-offs (arena count, not re-verified); they use evidence_01-53 and 62-94. Hand-made style samples: 01,02,04-08,10 (evidence_54-61).
+Log dialects: key=value, pipe, syslog <12>1, JSON lines; join on trace_id. SQL: primary + replica tables (12 replica-only account rows). PNG: tesseract is partly garbage (reads "user1- account_5762", real is "user_11"); use a vision model as authority, OCR only as cross-check. PDFs: pdftotext. retention_until also lives in JSON/SQL/logs (2031-2034), none expired. Legal register PDF (evidence_27) lists user_08/12/17/21/24/29, produces NO step in samples.
+
+## Traps
+1. reported_status / reported_result are claims (case_24 deletion SUCCESS but account_5334 still returns 200 in evidence_92).
+2. Decoy emails (g.silva76.jr@gmail.com): exact match only.
+3. Evidence after audit_at ignored for state (case_39: data_flow_1121 repopulates search_4801 on 08-25 after the 08-08 audit; case_55: backup_9287 restore 08-22 after the 04-30 audit). Recreation activities: "Active connector repopulated downstream resource X" (SYNC, 31), "Restore job repopulated downstream resource X" (1), "remains enabled" (89), "can still be restored" (28).
+4. Same people in samples and eval with different audit_at (priya.raman: sample 07, eval 61; leonie.g9352: sample 17, eval 46; ingrid.dahl twice: case_33, case_52). Never reuse sample answers.
+5. ACCOUNT ID is the biggest risk: 13 of 32 sample account ids appear in no evidence TEXT file by plain grep (arena counted 15 incl. image/OCR effects); e.g. account_001, 002, 004, 007, 008, 010, 5521, 5037, 4990, 7012, 4163, 4857, 8858. All but account_004 appear as account_service DELETE_RECORD activities (account_001, 004, 007, 4163, 4857, 5521, 8858...). Evidence-only linking finds an account for just 189/508 deletion cases. account_004 appears nowhere except sample_output.
+6. LINK_RESOURCE_IDENTITY activities (12) bridge image/PDF resources to email + user_id (activity time = image capture + 7 min). 12 one-offs depend on images: case_33/52, 34, 35, 39, 45, 46, 50, 53, 55, 61, 63.
+7. Conflict: evidence_60 (marketing PNG) shows marketing_001 with sj.park@naver.com (Soo-jin Park), which is in no identity table; activity_4008 links marketing_001 to kwame-mensah@proton.me / user_09 (case_63). RULE: ownership comes only from explicit link records; an image proves existence and state, not owner. Emit REMAINING/DELETE/VERIFY_ABSENT for marketing_001 citing evidence_60; mark high-uncertainty; note "image identity not in identity tables" in reasoning.
+8. Only the audit-record id may be read from post-audit files (see SPEC).
+9. Cutoff is inclusive: 7 samples cite files captured exactly at audit_at.
+10. Activity-only noise vs signal: system_activity has event types DELETE_RECORD 890, UPDATE_RECORD 672, SYNC_RECORD 447, INDEX_RECORD 400, SEND_EMAIL 368, REFRESH_CACHE 284, RETAIN_RECORD 206, ANONYMIZE_RECORD 204, REDACT_RECORD 173, CREATE_EXPORT 155, CHECK_DATA_FLOW 89, DISABLE_DATA_FLOW 36, BLOCK_RESTORE 36, CHECK_RESTORE_ACCESS 28, LINK_RESOURCE_IDENTITY 12, CLASSIFY_REQUEST 10, RESTORE_BACKUP 1. Systems include email_delivery_service, cache_service, archive_service, object_store (exports), tombstone_* resources (identity_service, evidence_51/52). Which of these become gold steps is only partly known (see SPEC, no-gold list).
+11. reported_status distribution in the 518: COMPLETE 254, PARTIALLY_COMPLETE 152, NOT_STARTED 112 (claims only).
