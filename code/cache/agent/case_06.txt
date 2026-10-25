@@ -1,0 +1,28 @@
+{
+ "case_id": "case_06",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "",
+  "method": "abstain"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": null,
+  "plan_review": "concern",
+  "concerns": [
+   "No account candidates identified; plan cannot target a specific account."
+  ],
+  "reason": "The request authorizes deletion but no matching account was found, making the deletion plan incomplete."
+ },
+ "problems": [],
+ "raw_final": "{\"name\": \"JSON\", \"arguments\": {\n  \"intent\": \"DELETE\",\n  \"account_id\": null,\n  \"plan_review\": \"concern\",\n  \"concerns\": [\"No account candidates identified; plan cannot target a specific account.\"],\n  \"reason\": \"The request authorizes deletion but no matching account was found, making the deletion plan incomplete.\"\n}}"
+}

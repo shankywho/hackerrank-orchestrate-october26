@@ -1,0 +1,30 @@
+{
+ "case_id": "case_14",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_3677"
+ ],
+ "evidence_candidates": [
+  "account_3677"
+ ],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "account_3677",
+  "method": "evidence"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": "account_3677",
+  "plan_review": "ok",
+  "concerns": [],
+  "reason": "The request explicitly asks for full deletion and the account is uniquely linked to the email."
+ },
+ "problems": [],
+ "raw_final": "{\n  \"intent\": \"DELETE\",\n  \"account_id\": \"account_3677\",\n  \"plan_review\": \"ok\",\n  \"concerns\": [],\n  \"reason\": \"The request explicitly asks for full deletion and the account is uniquely linked to the email.\"\n}"
+}

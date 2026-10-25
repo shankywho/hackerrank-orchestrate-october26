@@ -1,0 +1,1 @@
+{"choices": [{"message": {"content": "", "tool_calls": []}}], "usage": {}, "_tool_use_failed": "{\"name\": \"JSON\", \"arguments\": {\"intent\":\"DELETE\",\"account_id\":\"account_5037\",\"plan_review\":\"ok\",\"concerns\":[],\"reason\":\"Request authorizes deletion and a single account candidate was identified.\"}}"}

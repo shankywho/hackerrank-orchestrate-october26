@@ -1,0 +1,26 @@
+model openai/gpt-oss-120b; routed 167 {'not_applicable': 10, 'image_link': 12, 'ambiguous': 145}; already done 0
+budget: cap 200,000/day, usable 180,000, used in last 24 h 99,688, estimate 3,104 tokens/case (measured over 32 cases) => about 25 more cases fit; 142 would be skipped for the cap
+  case_534: 3 tool calls, verdict=ok
+  case_533: 4 tool calls, verdict=ok
+  case_536: 3 tool calls, verdict=ok
+  case_535: 3 tool calls, verdict=ok
+  case_538: 3 tool calls, verdict=ok
+  case_537: 3 tool calls, verdict=ok
+  case_539: 3 tool calls, verdict=ok
+  case_540: 3 tool calls, verdict=ok
+  case_542: 3 tool calls, verdict=ok
+  case_541: 3 tool calls, verdict=ok
+  case_35: 3 tool calls, verdict=ok
+  case_33: 3 tool calls, verdict=ok
+  case_45: 3 tool calls, verdict=ok
+  case_39: 3 tool calls, verdict=ok
+  case_34: 3 tool calls, verdict=ok
+  case_46: 3 tool calls, verdict=ok
+  case_104: 3 tool calls, verdict=ok
+  case_103: 3 tool calls, verdict=ok
+  case_107: 3 tool calls, verdict=ok
+  case_106: 3 tool calls, verdict=ok
+  case_109: 3 tool calls, verdict=ok
+  case_110: 3 tool calls, verdict=ok
+daily budget reached (176,132 used of 180,000 usable): skipping 139 case(s)
+finished: full agent done on 22 of 167 routed cases; skipped for the cap: 145

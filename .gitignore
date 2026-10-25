@@ -4,3 +4,5 @@ venv/
 __pycache__/
 .DS_Store
 .cache/
+code.zip
+agent-trace/

@@ -1,0 +1,31 @@
+{
+ "case_id": "case_533",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 4,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_1733"
+ ],
+ "evidence_candidates": [
+  "account_1733"
+ ],
+ "deterministic": {
+  "intent": "NOT_DELETE",
+  "account": "",
+  "method": ""
+ },
+ "verdict": {
+  "intent": "NOT_DELETE",
+  "account_id": "account_1733",
+  "plan_review": "ok",
+  "concerns": [],
+  "reason": "The request asks to update the mobile number and keep the account active, not to delete data."
+ },
+ "problems": [],
+ "raw_final": "{\"name\": \"JSON\", \"arguments\": {\"intent\":\"NOT_DELETE\",\"account_id\":\"account_1733\",\"plan_review\":\"ok\",\"concerns\":[],\"reason\":\"The request asks to update the mobile number and keep the account active, not to delete data.\"}}"
+}

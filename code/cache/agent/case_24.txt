@@ -1,0 +1,32 @@
+{
+ "case_id": "case_24",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_5334"
+ ],
+ "evidence_candidates": [
+  "account_5334"
+ ],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "account_5334",
+  "method": "evidence"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": "account_5334",
+  "plan_review": "concern",
+  "concerns": [
+   "plan incomplete"
+  ],
+  "reason": "The planner returned INCOMPLETE status, so the deletion plan is not fully defined."
+ },
+ "problems": [],
+ "raw_final": "{\"name\": \"json\", \"arguments\": {\"intent\":\"DELETE\",\"account_id\":\"account_5334\",\"plan_review\":\"concern\",\"concerns\":[\"plan incomplete\"],\"reason\":\"The planner returned INCOMPLETE status, so the deletion plan is not fully defined.\"}}"
+}

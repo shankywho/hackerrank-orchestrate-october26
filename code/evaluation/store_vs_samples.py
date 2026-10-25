@@ -16,16 +16,20 @@ sys.path.insert(0, str(ROOT / "code"))
 import coverage
 import normalizer
 from logparse import parse_line
+from observations import visible
 
 DS = ROOT / "dataset"
 SYSTEM_CATEGORY = {  # gold system_id -> acceptable store categories
     "search_service": {"SEARCH_INDEX_ENTRY"}, "export_service": {"USER_EXPORT"},
-    "support_platform": {"SUPPORT_MESSAGE", "SUPPORT_ATTACHMENT"}, "object_storage": {"SUPPORT_ATTACHMENT"},
+    "support_platform": {"SUPPORT_MESSAGE", "SUPPORT_ATTACHMENT", "SECONDARY_IDENTIFIER"}, "object_storage": {"SUPPORT_ATTACHMENT"},
     "marketing_platform": {"MARKETING_PROFILE"}, "analytics_platform": {"ANALYTICS_PROFILE"},
     "integration_service": {"DATA_FLOW"}, "backup_service": {"BACKUP_ARCHIVE"},
     "security_service": {"SECURITY_AUDIT_LOG"}, "legal_service": {"LEGAL_HOLD_RECORD"},
     "identity_service": {"ACCOUNT_TOMBSTONE"}, "account_service": {"USER_PROFILE"},
 }
+# Category comes from the record's own fields, so a row reported under one gold system can carry
+# another category (a contact_lookup row on an analytics_* resource is MARKETING_PROFILE, rule_10).
+ALT_CATEGORY = {"analytics_platform": {"MARKETING_PROFILE"}}
 FINDING_STATE = {"REPORT_REMAINING_RECORD": "FOUND", "REPORT_EXPOSED_PII": "IDENTIFIABLE",
                  "REPORT_ACTIVE_DATA_FLOW": "ACTIVE", "REPORT_RESTORE_RISK": "ACTIVE"}
 VERIFY_STATE = {"VERIFY_RECORD_ABSENT": "NOT_FOUND", "VERIFY_RECORD_PRESENT": "FOUND",
@@ -57,7 +61,7 @@ def implied(steps):
 
 def latest_states(obs_list, audit_at):
     """States from the newest observation(s) with file captured_at <= audit_at, by observed_at."""
-    ok = [o for o in obs_list if o.captured_at <= audit_at]
+    ok = [o for o in obs_list if visible(o, audit_at)]  # per file AND per row
     if not ok:
         return None, set(), []
     top = max(o.observed_at for o in ok)
@@ -75,7 +79,7 @@ def part1(store, list_all):
         for (system, rid), (state, why, cited) in implied(json.loads(g["steps_json"])).items():
             if system == "account_service":
                 continue
-            cats = SYSTEM_CATEGORY.get(system, set())
+            cats = SYSTEM_CATEGORY.get(system, set()) | ALT_CATEGORY.get(system, set())
             obs = [o for o in store.by_resource.get(rid, []) if o.category in cats]
             newest, states, ok = latest_states(obs, audit)
             cited_hit = [e for e in cited if any(o.file_id == e for o in store.by_resource.get(rid, []))]

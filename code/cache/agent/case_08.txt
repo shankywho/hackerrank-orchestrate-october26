@@ -1,0 +1,28 @@
+{
+ "case_id": "case_08",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "",
+  "method": "abstain"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": null,
+  "plan_review": "concern",
+  "concerns": [
+   "plan incomplete"
+  ],
+  "reason": "The request explicitly asks to delete the export file and intent is DELETE, but no account candidate was found."
+ },
+ "problems": [],
+ "raw_final": "{\"name\": \"json\", \"arguments\": {\n  \"intent\": \"DELETE\",\n  \"account_id\": null,\n  \"plan_review\": \"concern\",\n  \"concerns\": [\"plan incomplete\"],\n  \"reason\": \"The request explicitly asks to delete the export file and intent is DELETE, but no account candidate was found.\"\n}}"
+}

@@ -1,0 +1,26 @@
+{
+ "case_id": "case_542",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "NOT_DELETE",
+  "account": "",
+  "method": ""
+ },
+ "verdict": {
+  "intent": "NOT_DELETE",
+  "account_id": null,
+  "plan_review": "ok",
+  "concerns": [],
+  "reason": "The request explicitly asks for data copy and states not to delete anything."
+ },
+ "problems": [],
+ "raw_final": "{\"intent\":\"NOT_DELETE\",\"account_id\":null,\"plan_review\":\"ok\",\"concerns\":[],\"reason\":\"The request explicitly asks for data copy and states not to delete anything.\"}"
+}

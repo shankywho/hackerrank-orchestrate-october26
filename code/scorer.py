@@ -23,8 +23,9 @@ STEP_KEY = [f for f in FIELDS if f != "step_no"]
 STATUSES = ["COMPLETE", "INCOMPLETE", "NOT_APPLICABLE"]
 
 
-def load(path):
-    """case_id -> (status, steps list). Bad steps_json becomes None (scored as empty)."""
+def load(path, exclude_systems=()):
+    """case_id -> (status, steps list). Bad steps_json becomes None (scored as empty).
+    exclude_systems drops those systems' steps and renumbers (e.g. score without account steps)."""
     out = {}
     with open(path, newline="", encoding="utf-8") as fh:
         for row in csv.DictReader(fh):
@@ -34,6 +35,9 @@ def load(path):
                     steps = None
             except (json.JSONDecodeError, TypeError):
                 steps = None
+            if steps is not None and exclude_systems:
+                steps = [dict(s, step_no=i) for i, s in
+                         enumerate([s for s in steps if s.get("system_id") not in exclude_systems], 1)]
             out[row["case_id"]] = (row["deletion_status"], steps)
     return out
 
@@ -197,15 +201,27 @@ def main():
     ap.add_argument("--pred", default=str(ROOT / "output.csv"))
     ap.add_argument("--gold", default=str(ROOT / "dataset" / "sample_output.csv"))
     ap.add_argument("--verbose", action="store_true")
+    ap.add_argument("--exclude-system", action="append", default=[],
+                    help="drop this system_id's steps from gold and pred (repeatable)")
+    ap.add_argument("--missing", action="store_true", help="list gold steps absent from pred and extra pred steps")
     ap.add_argument("--self-test", action="store_true")
     a = ap.parse_args()
-    gold = load(a.gold)
+    gold = load(a.gold, a.exclude_system)
     if a.self_test:
         print("self-test:")
         sys.exit(0 if self_test(gold) else 1)
     if not Path(a.pred).exists():
         sys.exit(f"pred file not found: {a.pred}")
-    print(report(score(gold, load(a.pred)), a.verbose))
+    pred = load(a.pred, a.exclude_system)
+    print(report(score(gold, pred), a.verbose))
+    if a.missing:
+        for cid in sorted(gold):
+            g = Counter(map(tup, gold[cid][1] or []))
+            p = Counter(map(tup, (pred.get(cid, (None, []))[1]) or []))
+            for k in (g - p):
+                print(f"  MISSING {cid} {k}")
+            for k in (p - g):
+                print(f"  EXTRA   {cid} {k}")
 
 
 if __name__ == "__main__":

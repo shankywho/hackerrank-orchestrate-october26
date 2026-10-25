@@ -1,0 +1,29 @@
+{
+ "case_id": "case_107",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_687",
+  "account_7510"
+ ],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "",
+  "method": "abstain"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": null,
+  "plan_review": "ok",
+  "concerns": [],
+  "reason": "The request clearly authorizes deletion, but no single account can be uniquely identified from the evidence."
+ },
+ "problems": [],
+ "raw_final": "{\"intent\":\"DELETE\",\"account_id\":null,\"plan_review\":\"ok\",\"concerns\":[],\"reason\":\"The request clearly authorizes deletion, but no single account can be uniquely identified from the evidence.\"}"
+}

@@ -1,0 +1,26 @@
+{
+ "case_id": "case_541",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "NOT_DELETE",
+  "account": "",
+  "method": ""
+ },
+ "verdict": {
+  "intent": "NOT_DELETE",
+  "account_id": null,
+  "plan_review": "ok",
+  "concerns": [],
+  "reason": "The request text does not request data deletion."
+ },
+ "problems": [],
+ "raw_final": "{\n  \"intent\": \"NOT_DELETE\",\n  \"account_id\": null,\n  \"plan_review\": \"ok\",\n  \"concerns\": [],\n  \"reason\": \"The request text does not request data deletion.\"\n}"
+}

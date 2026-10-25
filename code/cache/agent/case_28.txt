@@ -1,0 +1,29 @@
+{
+ "case_id": "case_28",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_5482",
+  "account_7012"
+ ],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "",
+  "method": "abstain"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": null,
+  "plan_review": "ok",
+  "concerns": [],
+  "reason": "The request explicitly asks for verification of deletion and the deterministic intent is DELETE; no single account is uniquely linked, so null is appropriate."
+ },
+ "problems": [],
+ "raw_final": "{\"intent\":\"DELETE\",\"account_id\":null,\"plan_review\":\"ok\",\"concerns\":[],\"reason\":\"The request explicitly asks for verification of deletion and the deterministic intent is DELETE; no single account is uniquely linked, so null is appropriate.\"}"
+}

@@ -1,0 +1,31 @@
+{
+ "case_id": "case_104",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_4514",
+  "account_8804"
+ ],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "",
+  "method": "abstain"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": null,
+  "plan_review": "concern",
+  "concerns": [
+   "Plan incomplete; status INCOMPLETE indicates missing steps"
+  ],
+  "reason": "No unique account identified; plan cannot be completed"
+ },
+ "problems": [],
+ "raw_final": "{\"intent\":\"DELETE\",\"account_id\":null,\"plan_review\":\"concern\",\"concerns\":[\"Plan incomplete; status INCOMPLETE indicates missing steps\"],\"reason\":\"No unique account identified; plan cannot be completed\"}"
+}

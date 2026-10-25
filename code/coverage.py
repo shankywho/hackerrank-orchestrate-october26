@@ -9,6 +9,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import links
 import normalizer
 from observations import Store
 
@@ -19,14 +20,18 @@ def run():
     store = Store()
     rows = []
     for row in normalizer.load_manifest():
-        obs, skip = normalizer.normalize_file(row)
+        cov = []
+        obs, skip = normalizer.normalize_file(row, cov)
         store.add_all(obs)
+        store.add_coverage(cov)
+        store.file_times[row["file_id"]] = row["captured_at"]
         rows.append((row, obs, skip))
+    store.apply_links(links.load_links())
     return store, rows
 
 
 def is_skip(reason):
-    return reason is not None and reason != normalizer.EMPTY
+    return reason is not None and reason not in (normalizer.EMPTY, normalizer.NO_RESOURCE)
 
 
 def family(row):
@@ -69,6 +74,10 @@ def render(store, rows):
     L += ["", "## Log events seen but not turned into observations", "",
           "| service:event | lines |", "|---|---|"]
     L += [f"| {k} | {v} |" for k, v in sorted(normalizer.IGNORED_NOTE.items())]
+    zero = [c for c in store.coverage if c.row_count == 0]
+    L += ["", f"## Empty collections (coverage records with row_count 0): {len(zero)} of {len(store.coverage)} "
+          "collections", "", "| file_id | store | collection | captured_at | row_count |", "|---|---|---|---|---|"]
+    L += [f"| {c.file_id} | {c.store} | {c.collection} | {c.captured_at} | 0 |" for c in zero]
     no_subject = sum(1 for o in store.obs if not o.subject_key)
     L += ["", f"observations with empty subject_key: {no_subject}", ""]
     return "\n".join(L)

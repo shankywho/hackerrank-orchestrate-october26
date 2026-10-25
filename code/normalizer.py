@@ -18,8 +18,9 @@ import sqlite3
 from collections import Counter
 from pathlib import Path
 
+import pdfparse
 from logparse import parse_line
-from observations import Observation, make, norm_id
+from observations import CoverageRecord, Observation, make, norm_id
 
 EVIDENCE_ROOT = Path(__file__).resolve().parent.parent / "dataset"
 HASH = re.compile(r"^[0-9a-f]{64}$")
@@ -128,9 +129,12 @@ def from_lookup(fid, cap, rec, source):
 
 
 # ---------------------------------------------------------------- JSON
-def from_service_exports(fid, cap, doc, source):
+def from_service_exports(fid, cap, doc, source, cov):
     out = []
     ex = doc["service_exports"]
+    for system, sections in ex.items():
+        for name, rows in sections.items():
+            cov.append(CoverageRecord(fid, system, name, doc.get("exported_at") or cap, len(rows)))
     for r in ex.get("account_service", {}).get("profile_lookups", []):
         p = r.get("profile") or {}
         ids = dict(email=p.get("email"), phone=p.get("phone"), email_hash=p.get("email_hash"),
@@ -170,19 +174,24 @@ def from_service_exports(fid, cap, doc, source):
     return out
 
 
-def norm_json(fid, cap, path):
+def norm_json(fid, cap, path, cov):
     doc = json.loads(path.read_text(encoding="utf-8"))
     out = []
     if "service_exports" in doc:
-        return from_service_exports(fid, cap, doc, "json:service_exports"), None
+        return from_service_exports(fid, cap, doc, "json:service_exports", cov), None
     if "snapshots" in doc:
         for sn in doc["snapshots"]:
+            cov.append(CoverageRecord(fid, sn["data_store"], sn["collection"], sn.get("captured_at") or cap,
+                                      len(sn.get("records", []))))
             for rec in sn.get("records", []):
                 out += from_collection(fid, cap, sn["data_store"], sn["collection"], rec,
                                        sn.get("captured_at"), "json:snapshots")
         return out, None
     if "records" in doc:
         coll = doc.get("collection")
+        cov.append(CoverageRecord(fid, COLLECTION_SYSTEM.get(coll, doc.get("source") or doc.get("origin") or ""),
+                                  coll or "ledger", doc.get("captured_at") or doc.get("exported_at") or cap,
+                                  len(doc["records"])))
         for rec in doc["records"]:
             if "record_type" in rec:
                 out += from_lookup(fid, cap, rec, "json:ledger")
@@ -203,7 +212,7 @@ COLLECTION_SYSTEM = {
 
 
 # ---------------------------------------------------------------- handover txt
-def norm_txt(fid, cap, path):
+def norm_txt(fid, cap, path, cov):
     out = []
     for line in path.read_text(encoding="utf-8").splitlines():
         parts = [p.strip() for p in line.lstrip("- ").split("|")]
@@ -214,12 +223,13 @@ def norm_txt(fid, cap, path):
 
 
 # ---------------------------------------------------------------- logs
-SERVICE_ALIAS = {"profile_service": "account_service"}
+SERVICE_ALIAS = {"profile_service": "account_service", "support_replica": "support_platform",
+                 "attachment_preview": "support_platform"}
 STARTED_KEYS = ("lookup_key", "match_key", "scan_key", "subject_key", "subject_ref", "correlation_key")
 IGNORED_NOTE = Counter()
 
 
-def norm_log(fid, cap, path):
+def norm_log(fid, cap, path, cov):
     parsed = []
     for line in path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
@@ -235,6 +245,8 @@ def norm_log(fid, cap, path):
             if r.get(k) and r.get("trace_id"):
                 started.setdefault(r["trace_id"], r[k])
     out, ignored = [], Counter()
+    batch_source = {path.name: next((r["source"] for _, r in parsed if r.get("event") == "batch_started"
+                                     and r.get("source")), None)}
     for dialect, r in parsed:
         ev, svc = r.get("event"), SERVICE_ALIAS.get(r.get("service"), r.get("service"))
         rid, ts, src = r.get("resource_id"), r["ts"], f"log:{dialect}"
@@ -264,7 +276,9 @@ def norm_log(fid, cap, path):
                 state = scrub_state(ids, "ANONYMIZED", "IDENTIFIABLE")
             M("ANALYTICS_PROFILE", state, ids)
         elif ev == "contact_lookup_completed":
-            M("MARKETING_PROFILE", "FOUND", base, email_opt_in=r.get("email_opt_in"))
+            # INFERRED (rule_10, no sample gold beyond one case): a contact/opt-in lookup is a marketing profile
+            # whatever the resource id prefix says; the category comes from the record's own fields.
+            M("MARKETING_PROFILE", "FOUND", base, email_opt_in=r.get("email_opt_in"), inferred="marketing_by_fields")
         elif ev == "restore_policy_read_completed":
             ids = {**base, **ids_from(r.get("customer_email"))}
             M("BACKUP_ARCHIVE", "ACTIVE" if truthy(r.get("restore_allowed")) else "BLOCKED", ids,
@@ -303,7 +317,16 @@ def norm_log(fid, cap, path):
         elif ev == "retained_order_loaded":
             M("LEGAL_HOLD_RECORD", "FOUND", base, reason=r.get("reason"), access=r.get("access"))
         elif ev == "contact_query_completed" and rid:
-            M("SUPPORT_MESSAGE", "IDENTIFIABLE", base, source_index=r.get("source"), inferred="legacy_contact_index")
+            # presence only: a contact/case index row exists. Category by index (inferred, flagged).
+            idx = r.get("source") or batch_source.get(path.name)
+            cat = "SECONDARY_IDENTIFIER" if idx == "legacy_contact_index" else "SUPPORT_MESSAGE"
+            M(cat, "FOUND", base, source_index=idx, replica_of=r.get("service"), inferred="contact_index_presence")
+        elif ev == "deletion_marker_check" and rid:
+            # marker_found=false: the record exists and no deletion was recorded against it
+            M("SECONDARY_IDENTIFIER", "FOUND", base, marker_found=r.get("marker_found"),
+              last_write=r.get("last_write"), replica_of=r.get("service"), inferred="deletion_marker")
+        elif ev == "thumbnail_failed" and rid:
+            M("SUPPORT_ATTACHMENT", "FOUND", base, reason=r.get("reason"), replica_of=r.get("service"))
         else:
             ignored[f"{svc}:{ev}"] += 1
     IGNORED_NOTE.update(ignored)
@@ -329,17 +352,21 @@ TABLE_COLLECTION = {  # typed (non record_json) table -> (system, collection)
 }
 
 
-def norm_sql(fid, cap, path):
+def norm_sql(fid, cap, path, cov):
     db = sqlite3.connect(":memory:")
     db.row_factory = sqlite3.Row
     db.executescript(path.read_text(encoding="utf-8"))
-    out, skipped = [], []
+    out = []
+    scope = {}
+    if db.execute("select 1 from sqlite_master where name='snapshot_scope'").fetchone():
+        scope = {r[0]: r[1] for r in db.execute("select origin_system, captured_at from snapshot_scope")}
     for (t,) in db.execute("select name from sqlite_master where type='table' order by name").fetchall():
         rows = db.execute(f'select * from "{t}"').fetchall()
         source = f"sql:{t}"
         if t == "snapshot_scope":
-            skipped.append(t)
             continue
+        system = TABLE_COLLECTION.get(t, (t, t))[0]
+        cov.append(CoverageRecord(fid, system, t, scope.get(system, cap), len(rows)))
         for row in rows:
             rec = dict(row)
             observed = rec.get("updated_at") or rec.get("indexed_at")
@@ -354,25 +381,110 @@ def norm_sql(fid, cap, path):
     return out, (None if out else EMPTY)
 
 
+# ---------------------------------------------------------------- PNG (from the transcription cache)
+IMAGE_CACHE = Path(__file__).resolve().parent / "evidence_cache" / "images.md"
+_image_rows = None
+
+
+def image_rows():
+    """Rows of code/evidence_cache/images.md keyed by file_id (hand transcription made with Claude Code vision)."""
+    global _image_rows
+    if _image_rows is None:
+        _image_rows, fid = {}, None
+        for line in IMAGE_CACHE.read_text(encoding="utf-8").splitlines():
+            if line.startswith("## "):
+                fid = line[3:].split()[0]
+            elif line.startswith("OBS |") and fid:
+                parts = [p.strip() for p in line.split("|")[1:]]
+                if len(parts) == 10:
+                    _image_rows.setdefault(fid, []).append(parts)
+    return _image_rows
+
+
+def norm_png(fid, cap, path, cov):
+    """Images prove existence and state. They carry NO identifiers: ownership comes only from link records
+    (links.py), so what is visible on screen is kept as attributes for cross-checks."""
+    rows = image_rows().get(fid)
+    if not rows:
+        return [], "PNG, not in evidence_cache/images.md"
+    out = []
+    for system, label, kind, cat, state, email, user, phone, times, note in rows:
+        out.append(make(fid, cap, cap, system, label, cat, state, {}, "png:cache", alias=(kind == "alias") or None,
+                        visible_email=email or None, visible_user_id=user or None, visible_phone=phone or None,
+                        visible_times=times or None, inferred="INFERRED" if "INFERRED" in note else None))
+    return out, None
+
+
+# ---------------------------------------------------------------- PDF
+NO_RESOURCE = "PARSED, no resource id (identity facts only)"
+MONTHS = {m: i for i, m in enumerate(("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+                                      "Nov", "Dec"), 1)}
+DATE = r"(\d{1,2}) (%s) (\d{4}) (\d{1,2})\s*:?\s*(\d{2}) UTC" % "|".join(MONTHS)
+EMAIL = re.compile(r"[\w.+\-]+@[\w\-]+\.[\w.\-]+")
+PHONE_TXT = re.compile(r"\+\d[\d ()\-]{7,}\d")
+
+
+def pdf_time(text, label):
+    m = re.search(label + r"\s+" + DATE, text)
+    if not m:
+        return None
+    d, mon, y, h, mi = m.groups()
+    return f"{int(y):04d}-{MONTHS[mon]:02d}-{int(d):02d}T{int(h):02d}:{mi}:00Z"
+
+
+def norm_pdf(fid, cap, path, cov):
+    text = " ".join(pdfparse.extract_lines(path))
+    out = []
+    if m := re.search(r"Event reference\s+(\w+)\s+.*?subject reference\s+(\w+)", text):  # audit journal extract
+        rid, user = m.groups()
+        out.append(make(fid, cap, pdf_time(text, "recorded"), "security_service", rid, "SECURITY_AUDIT_LOG",
+                        "FOUND", ids_from(user), "pdf:journal", retention_until=pdf_time(text, "retain until")))
+    elif m := re.search(r"[Ss]upport reference\s+\S+\s*/\s*(support_\w+)", text):  # attachment document
+        ids = {}
+        if e := EMAIL.search(text):
+            ids["email"] = e.group(0)
+        if ph := PHONE_TXT.search(text):
+            ids["phone"] = ph.group(0)
+        f = re.search(r"\bfile\s+(\S+\.\w+)", text)
+        out.append(make(fid, cap, pdf_time(text, "captured"), "support_platform", m.group(1),
+                        "SUPPORT_ATTACHMENT", "FOUND", ids, "pdf:attachment",
+                        file_name=f.group(1) if f else None))
+    elif "Retain until" in text and re.search(r"ORD-\d+\s*\|", text):  # legal register, keyed by order
+        when = pdf_time(text, "generated") or cap
+        for order, user, until in re.findall(
+                r"(ORD-\d+)\s*\|\s*(user_\w+)\s*\|[^|]*\|[^|]*\|[^|]*\|\s*Retain until\s+(\d{1,2} \w{3} \d{4})", text):
+            d, mon, y = until.split()
+            out.append(make(fid, cap, when, "legal_service", order, "LEGAL_HOLD_RECORD", "FOUND", ids_from(user),
+                            "pdf:register", keyed_by="order_reference",
+                            retained_until=f"{int(y):04d}-{MONTHS[mon]:02d}-{int(d):02d}"))
+    elif m := re.search(r"CUSTOMER STATEMENT.*?Statement\s+(NST-[\w-]+)", text):
+        # a customer statement is an export artifact; it names no resource id, only its own number, so it is an
+        # alias resolved through a link record (LINK_RESOURCE_IDENTITY) and carries no identifiers itself
+        out.append(make(fid, cap, cap, "export_service", m.group(1), "USER_EXPORT", "FOUND", {}, "pdf:statement",
+                        alias=True))
+    else:
+        return [], "PDF layout not recognised"
+    return out, (None if out else "PDF matched a layout but no rows")
+
+
 # ---------------------------------------------------------------- dispatch
 def load_manifest():
     with open(EVIDENCE_ROOT / "evidence_files.csv", newline="", encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
 
 
-def normalize_file(row):
-    """Return (observations, skip_reason). skip_reason is None when parsed."""
+def normalize_file(row, cov=None):
+    """Return (observations, note). note None = parsed; EMPTY / NO_RESOURCE = parsed, nothing to emit.
+    Coverage records (one per collection, incl. row_count 0) are appended to `cov`."""
+    cov = [] if cov is None else cov
     fid, cap = row["file_id"], row["captured_at"]
     path = EVIDENCE_ROOT / row["file_path"]
     ext = path.suffix.lower()
-    if ext == ".png":
-        return [], "PNG, needs vision"
-    if ext == ".pdf":
-        return [], "PDF, needs pdftotext parser (not built yet)"
-    parsers = {".json": norm_json, ".log": norm_log, ".sql": norm_sql, ".txt": norm_txt}
+    parsers = {".json": norm_json, ".log": norm_log, ".sql": norm_sql, ".txt": norm_txt, ".pdf": norm_pdf,
+               ".png": norm_png}
     if ext not in parsers:
         return [], f"unsupported extension {ext}"
     try:
-        return parsers[ext](fid, cap, path)
+        return parsers[ext](fid, cap, path, cov)
     except Exception as exc:  # report, never hide: coverage shows the failure
         return [], f"PARSE ERROR {type(exc).__name__}: {exc}"

@@ -1,0 +1,32 @@
+{
+ "case_id": "case_15",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_4745"
+ ],
+ "evidence_candidates": [
+  "account_4745"
+ ],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "account_4745",
+  "method": "evidence"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": "account_4745",
+  "plan_review": "concern",
+  "concerns": [
+   "plan incomplete"
+  ],
+  "reason": "The request clearly authorizes deletion and a unique account candidate is identified, but the proposed plan is marked INCOMPLETE, indicating the deletion workflow has not fully finished."
+ },
+ "problems": [],
+ "raw_final": "{\"intent\":\"DELETE\",\"account_id\":\"account_4745\",\"plan_review\":\"concern\",\"concerns\":[\"plan incomplete\"],\"reason\":\"The request clearly authorizes deletion and a unique account candidate is identified, but the proposed plan is marked INCOMPLETE, indicating the deletion workflow has not fully finished.\"}"
+}

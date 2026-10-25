@@ -1,6 +1,6 @@
 # Evidence coverage report
 
-manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
+manifest files: 94  observations: 2902  parsed files: 83  skipped: 11
 
 ## Per file
 
@@ -23,7 +23,7 @@ manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
 | evidence_15 | 2026-08-02T07:00:00Z | evidence/databases/customer_data_read_replica_20260802.sql | 49 | parsed |
 | evidence_16 | 2026-07-30T08:53:12Z | evidence/logs/application_trace_ap_northeast_20260730.log | 36 | parsed |
 | evidence_17 | 2026-07-25T15:00:00Z | evidence/records/customer_data_snapshot_bundle_20260725.json | 36 | parsed |
-| evidence_18 | 2026-07-18T11:00:00Z | evidence/documents/account_history_report_20260718.pdf | 0 | SKIPPED: PDF, needs pdftotext parser (not built yet) |
+| evidence_18 | 2026-07-18T11:00:00Z | evidence/documents/account_history_report_20260718.pdf | 0 | PARSED, no resource id (identity facts only) |
 | evidence_19 | 2026-07-13T10:00:00Z | evidence/images/analytics_profile_view_20260713.png | 0 | SKIPPED: PNG, needs vision |
 | evidence_20 | 2026-07-08T09:00:00Z | evidence/databases/customer_data_read_replica_20260708.sql | 63 | parsed |
 | evidence_21 | 2026-07-05T07:54:27Z | evidence/logs/operations_stream_eu_central_20260705.log | 41 | parsed |
@@ -32,7 +32,7 @@ manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
 | evidence_24 | 2026-06-13T11:00:00Z | evidence/databases/customer_data_read_replica_20260613.sql | 50 | parsed |
 | evidence_25 | 2026-06-08T09:58:28Z | evidence/logs/cloud_runtime_export_us_west_20260608.log | 43 | parsed |
 | evidence_26 | 2026-06-05T12:00:00Z | evidence/records/customer_data_snapshot_bundle_20260605.json | 32 | parsed |
-| evidence_27 | 2026-05-29T08:00:00Z | evidence/documents/legal_retention_register_20260529.pdf | 0 | SKIPPED: PDF, needs pdftotext parser (not built yet) |
+| evidence_27 | 2026-05-29T08:00:00Z | evidence/documents/legal_retention_register_20260529.pdf | 6 | parsed |
 | evidence_28 | 2026-05-24T07:00:00Z | evidence/images/support_ticket_console_20260524.png | 0 | SKIPPED: PNG, needs vision |
 | evidence_29 | 2026-05-19T06:00:00Z | evidence/databases/customer_data_regional_replicas_20260519.sql | 85 | parsed |
 | evidence_30 | 2026-05-16T11:58:25Z | evidence/logs/service_events_sa_east_20260516.log | 38 | parsed |
@@ -60,13 +60,13 @@ manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
 | evidence_52 | 2026-09-20T12:00:00Z | evidence/databases/customer_data_failover_replica_20260920.sql | 32 | parsed |
 | evidence_53 | 2026-09-30T11:59:44Z | evidence/logs/cloud_runtime_export_af_south_20260930.log | 300 | parsed |
 | evidence_54 | 2026-09-02T23:00:00Z | evidence/databases/customer_accounts_failover_replica_20260902.sql | 7 | parsed |
-| evidence_55 | 2026-09-05T06:30:00Z | evidence/documents/security_retention_extract.pdf | 0 | SKIPPED: PDF, needs pdftotext parser (not built yet) |
+| evidence_55 | 2026-09-05T06:30:00Z | evidence/documents/security_retention_extract.pdf | 1 | parsed |
 | evidence_56 | 2026-09-07T09:45:00Z | evidence/records/customer_analytics_report_20260907.json | 2 | parsed |
 | evidence_57 | 2026-09-10T08:45:00Z | evidence/databases/customer_search_primary_20260910.sql | 3 | parsed |
-| evidence_58 | 2026-09-12T07:30:00Z | evidence/documents/delivery_correction_attachment.pdf | 0 | SKIPPED: PDF, needs pdftotext parser (not built yet) |
+| evidence_58 | 2026-09-12T07:30:00Z | evidence/documents/delivery_correction_attachment.pdf | 1 | parsed |
 | evidence_59 | 2026-09-14T15:40:00Z | evidence/records/customer_export_jobs_20260914.json | 2 | parsed |
 | evidence_60 | 2026-09-16T07:20:00Z | evidence/images/marketing_profile_console.png | 0 | SKIPPED: PNG, needs vision |
-| evidence_61 | 2026-09-17T22:00:19Z | evidence/logs/support_replica.log | 3 | parsed |
+| evidence_61 | 2026-09-17T22:00:19Z | evidence/logs/support_replica.log | 5 | parsed |
 | evidence_62 | 2026-01-29T11:44:59Z | evidence/records/service_resource_export_20260129_114459.json | 29 | parsed |
 | evidence_63 | 2026-02-13T07:43:27Z | evidence/databases/customer_data_inventory_20260213.sql | 17 | parsed |
 | evidence_64 | 2026-02-18T08:39:11Z | evidence/logs/resource_lookup_trace_20260218_083911.log | 26 | parsed |
@@ -116,11 +116,11 @@ manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
 | log/downstream_delivery_service | 1 | 39 | 0 |
 | log/search_index_service | 1 | 36 | 0 |
 | log/service_readback_logs | 11 | 264 | 0 |
-| log/support_platform | 1 | 3 | 0 |
-| pdf/account_history_service | 1 | 0 | 1 |
-| pdf/legal_retention_service | 1 | 0 | 1 |
-| pdf/security_service | 1 | 0 | 1 |
-| pdf/support_platform | 1 | 0 | 1 |
+| log/support_platform | 1 | 5 | 0 |
+| pdf/account_history_service | 1 | 0 | 0 |
+| pdf/legal_retention_service | 1 | 6 | 0 |
+| pdf/security_service | 1 | 1 | 0 |
+| pdf/support_platform | 1 | 1 | 0 |
 | png/account_admin_portal | 1 | 0 | 1 |
 | png/analytics_platform | 1 | 0 | 1 |
 | png/backup_service | 1 | 0 | 1 |
@@ -146,8 +146,8 @@ manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
 | format | files | observations |
 |---|---|---|
 | json | 28 | 890 |
-| log | 26 | 1070 |
-| pdf | 4 | 0 |
+| log | 26 | 1072 |
+| pdf | 4 | 8 |
 | png | 11 | 0 |
 | sql | 24 | 891 |
 | txt | 1 | 41 |
@@ -163,9 +163,12 @@ manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
 | log:bracket | 77 |
 | log:cloud | 343 |
 | log:json | 81 |
-| log:kv | 416 |
+| log:kv | 418 |
 | log:pipe | 77 |
 | log:syslog | 76 |
+| pdf:attachment | 1 |
+| pdf:journal | 1 |
+| pdf:register | 6 |
 | sql:backup_restore_entries | 10 |
 | sql:connector_subscriptions | 25 |
 | sql:customer_analytics_profiles | 41 |
@@ -197,12 +200,14 @@ manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
 | BACKUP_ARCHIVE | BLOCKED | 62 |
 | DATA_FLOW | ACTIVE | 181 |
 | DATA_FLOW | DISABLED | 62 |
-| LEGAL_HOLD_RECORD | FOUND | 12 |
+| LEGAL_HOLD_RECORD | FOUND | 18 |
 | MARKETING_PROFILE | FOUND | 1 |
 | SEARCH_INDEX_ENTRY | FOUND | 486 |
-| SECURITY_AUDIT_LOG | FOUND | 662 |
-| SUPPORT_ATTACHMENT | FOUND | 30 |
-| SUPPORT_MESSAGE | IDENTIFIABLE | 220 |
+| SECONDARY_IDENTIFIER | FOUND | 3 |
+| SECURITY_AUDIT_LOG | FOUND | 663 |
+| SUPPORT_ATTACHMENT | FOUND | 32 |
+| SUPPORT_MESSAGE | FOUND | 1 |
+| SUPPORT_MESSAGE | IDENTIFIABLE | 217 |
 | SUPPORT_MESSAGE | REDACTED | 62 |
 | USER_EXPORT | FOUND | 52 |
 | USER_PROFILE | FOUND | 418 |
@@ -223,7 +228,6 @@ manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
 | analytics_platform:connection_acquired | 16 |
 | analytics_platform:dependency_recovered | 6 |
 | analytics_platform:dependency_retry | 6 |
-| attachment_preview:thumbnail_failed | 1 |
 | backup_service:cache_lookup | 4 |
 | backup_service:connection_acquired | 4 |
 | backup_service:dependency_recovered | 2 |
@@ -271,18 +275,40 @@ manifest files: 94  observations: 2892  parsed files: 79  skipped: 15
 | security_service:dependency_recovered | 23 |
 | security_service:dependency_retry | 23 |
 | support_platform:attachment_scan_started | 5 |
+| support_platform:batch_started | 1 |
 | support_platform:cache_lookup | 13 |
+| support_platform:checkpoint_saved | 1 |
 | support_platform:connection_acquired | 13 |
+| support_platform:contact_query_started | 2 |
 | support_platform:dependency_recovered | 7 |
 | support_platform:dependency_retry | 7 |
 | support_platform:message_scan_started | 29 |
 | support_platform:support_ticket_read_started | 34 |
-| support_replica:batch_started | 1 |
-| support_replica:checkpoint_saved | 1 |
-| support_replica:contact_query_started | 2 |
-| support_replica:deletion_marker_check | 1 |
 | systemd:timer_tick | 2 |
 | thread_pool:pool_sample | 2 |
 | webhook_delivery:delivery_abandoned | 8 |
 
-observations with empty subject_key: 258
+## Empty collections (coverage records with row_count 0): 18 of 322 collections
+
+| file_id | store | collection | captured_at | row_count |
+|---|---|---|---|---|
+| evidence_07 | account_service | customer_profiles | 2026-09-11T08:00:00Z | 0 |
+| evidence_31 | account_service | customer_profiles | 2026-05-09T11:00:00Z | 0 |
+| evidence_51 | account_service | customer_profiles | 2026-09-15T12:00:00Z | 0 |
+| evidence_63 | export_service | customer_exports | 2026-02-13T07:43:27Z | 0 |
+| evidence_66 | account_service | customer_profiles | 2026-03-10T05:38:48Z | 0 |
+| evidence_69 | account_service | customer_profiles | 2026-04-04T10:04:19Z | 0 |
+| evidence_72 | export_service | customer_exports | 2026-05-04T09:41:47Z | 0 |
+| evidence_75 | account_service | customer_profiles | 2026-05-24T06:39:55Z | 0 |
+| evidence_78 | backup_service | backup_restore_entries | 2026-06-18T11:44:03Z | 0 |
+| evidence_81 | account_service | customer_profiles | 2026-07-03T07:43:56Z | 0 |
+| evidence_90 | backup_service | backup_restore_entries | 2026-09-05T07:18:01Z | 0 |
+| evidence_90 | integration_service | connector_subscriptions | 2026-09-05T07:18:01Z | 0 |
+| evidence_90 | analytics_platform | customer_analytics_profiles | 2026-09-05T07:18:01Z | 0 |
+| evidence_90 | export_service | customer_exports | 2026-09-05T07:18:01Z | 0 |
+| evidence_90 | account_service | customer_profiles | 2026-09-05T07:18:01Z | 0 |
+| evidence_90 | search_service | customer_search_documents | 2026-09-05T07:18:01Z | 0 |
+| evidence_90 | security_service | security_audit_records | 2026-09-05T07:18:01Z | 0 |
+| evidence_90 | support_platform | support_records | 2026-09-05T07:18:01Z | 0 |
+
+observations with empty subject_key: 259

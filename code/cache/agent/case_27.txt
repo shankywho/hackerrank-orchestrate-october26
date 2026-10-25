@@ -1,0 +1,28 @@
+{
+ "case_id": "case_27",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_3866"
+ ],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "account_3866",
+  "method": "singleton"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": "account_3866",
+  "plan_review": "ok",
+  "concerns": [],
+  "reason": "The request explicitly asks for deletion confirmation and a unique account candidate was identified."
+ },
+ "problems": [],
+ "raw_final": "{\"name\": \"JSON\", \"arguments\": {\"intent\":\"DELETE\",\"account_id\":\"account_3866\",\"plan_review\":\"ok\",\"concerns\":[],\"reason\":\"The request explicitly asks for deletion confirmation and a unique account candidate was identified.\"}}"
+}

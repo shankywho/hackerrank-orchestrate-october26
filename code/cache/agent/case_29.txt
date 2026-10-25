@@ -1,0 +1,31 @@
+{
+ "case_id": "case_29",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_5482",
+  "account_7012"
+ ],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "",
+  "method": "abstain"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": null,
+  "plan_review": "concern",
+  "concerns": [
+   "plan incomplete"
+  ],
+  "reason": "No single account can be identified from evidence"
+ },
+ "problems": [],
+ "raw_final": "{\"intent\":\"DELETE\",\"account_id\":null,\"plan_review\":\"concern\",\"concerns\":[\"plan incomplete\"],\"reason\":\"No single account can be identified from evidence\"}"
+}

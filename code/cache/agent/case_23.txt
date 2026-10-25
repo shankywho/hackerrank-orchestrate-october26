@@ -1,0 +1,32 @@
+{
+ "case_id": "case_23",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_410",
+  "account_7015",
+  "account_9155"
+ ],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "",
+  "method": "abstain"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": null,
+  "plan_review": "concern",
+  "concerns": [
+   "plan incomplete"
+  ],
+  "reason": "Request authorizes deletion but no uniquely linked account could be identified."
+ },
+ "problems": [],
+ "raw_final": "{\n  \"intent\": \"DELETE\",\n  \"account_id\": null,\n  \"plan_review\": \"concern\",\n  \"concerns\": [\"plan incomplete\"],\n  \"reason\": \"Request authorizes deletion but no uniquely linked account could be identified.\"\n}"
+}

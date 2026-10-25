@@ -1,0 +1,30 @@
+{
+ "case_id": "case_11",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_4248"
+ ],
+ "evidence_candidates": [
+  "account_4248"
+ ],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "account_4248",
+  "method": "evidence"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": "account_4248",
+  "plan_review": "ok",
+  "concerns": [],
+  "reason": "The request explicitly asks for account erasure and the deterministic intent is DELETE; the candidate account is uniquely linked and has matching delete activity."
+ },
+ "problems": [],
+ "raw_final": "{\"intent\":\"DELETE\",\"account_id\":\"account_4248\",\"plan_review\":\"ok\",\"concerns\":[],\"reason\":\"The request explicitly asks for account erasure and the deterministic intent is DELETE; the candidate account is uniquely linked and has matching delete activity.\"}"
+}

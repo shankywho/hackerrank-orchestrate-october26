@@ -1,0 +1,32 @@
+{
+ "case_id": "case_25",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 4,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "resolve_identity",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_3136",
+  "account_5684"
+ ],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "",
+  "method": "abstain"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": null,
+  "plan_review": "concern",
+  "concerns": [
+   "No unique account identified; multiple candidates present"
+  ],
+  "reason": "Request authorizes deletion but cannot pinpoint a single account."
+ },
+ "problems": [],
+ "raw_final": "{\"intent\":\"DELETE\",\"account_id\":null,\"plan_review\":\"concern\",\"concerns\":[\"No unique account identified; multiple candidates present\"],\"reason\":\"Request authorizes deletion but cannot pinpoint a single account.\"}"
+}

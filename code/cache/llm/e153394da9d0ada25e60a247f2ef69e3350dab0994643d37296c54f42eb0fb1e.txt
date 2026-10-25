@@ -1,0 +1,1 @@
+{"choices": [{"message": {"content": "", "tool_calls": []}}], "usage": {}, "_tool_use_failed": "{\"name\": \"JSON\", \"arguments\": {\n  \"intent\": \"DELETE\",\n  \"account_id\": \"account_005\",\n  \"plan_review\": \"ok\",\n  \"concerns\": [],\n  \"reason\": \"The request explicitly asks to remove remaining profile data and a unique account candidate is identified.\"\n}}"}

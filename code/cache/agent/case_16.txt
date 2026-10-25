@@ -1,0 +1,30 @@
+{
+ "case_id": "case_16",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_994"
+ ],
+ "evidence_candidates": [
+  "account_994"
+ ],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "account_994",
+  "method": "evidence"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": "account_994",
+  "plan_review": "ok",
+  "concerns": [],
+  "reason": "Deterministic intent is DELETE and a single linked account candidate exists."
+ },
+ "problems": [],
+ "raw_final": "{\"intent\":\"DELETE\",\"account_id\":\"account_994\",\"plan_review\":\"ok\",\"concerns\":[],\"reason\":\"Deterministic intent is DELETE and a single linked account candidate exists.\"}"
+}

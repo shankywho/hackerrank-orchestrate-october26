@@ -1,0 +1,31 @@
+{
+ "case_id": "case_109",
+ "model": "openai/gpt-oss-120b",
+ "tool_calls": 3,
+ "trace": [
+  "get_case",
+  "list_account_candidates",
+  "propose_plan"
+ ],
+ "candidates": [
+  "account_687",
+  "account_7510"
+ ],
+ "evidence_candidates": [],
+ "deterministic": {
+  "intent": "DELETE",
+  "account": "",
+  "method": "abstain"
+ },
+ "verdict": {
+  "intent": "DELETE",
+  "account_id": null,
+  "plan_review": "concern",
+  "concerns": [
+   "plan incomplete due to missing account selection"
+  ],
+  "reason": "The request clearly authorizes deletion, but the candidate accounts cannot be uniquely identified."
+ },
+ "problems": [],
+ "raw_final": "{\n  \"intent\": \"DELETE\",\n  \"account_id\": null,\n  \"plan_review\": \"concern\",\n  \"concerns\": [\"plan incomplete due to missing account selection\"],\n  \"reason\": \"The request clearly authorizes deletion, but the candidate accounts cannot be uniquely identified.\"\n}"
+}
